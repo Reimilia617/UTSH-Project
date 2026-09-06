@@ -94,6 +94,34 @@ cargo run -p utsh-cli -- webui     # 自动打开浏览器
   终端：xterm-256color / iTerm2 / Alacritty / Kitty。
 - 安全：WebUI 默认绑定 127.0.0.1 + 随机 64 位 Token；插件安装 git 签名（可选）。
 
+## 发布与安装（GitHub Release）
+
+每个版本发布到 GitHub Release，包含：`.deb`、`.rpm`、FHS 全量 `tar.gz`、
+仅二进制 `tar.gz` 与 `SHA256SUMS`。
+
+```bash
+# 一键安装最新版（Debian→dpkg、RPM 系→rpm、其余→通用 FHS 布局；需 root）
+bash <(curl -fsSL https://raw.githubusercontent.com/Reimilia617/UTSH-Project/main/scripts/install.sh)
+
+# 指定版本 / 手动方式 / 测试根
+sudo UTSH_VERSION=0.1.0 bash scripts/install.sh
+sudo bash scripts/install.sh --method tarball
+
+# 卸载（彻底干净：包注册 + 全部文件；用户数据默认保留）
+sudo bash <(curl -fsSL https://raw.githubusercontent.com/Reimilia617/UTSH-Project/main/scripts/uninstall.sh)
+sudo bash scripts/uninstall.sh --purge-user     # 连 ~/.config/ut 等用户数据一并清除
+```
+
+本地制作发行物与发布：
+
+```bash
+bash scripts/package.sh          # → dist/: .deb / .rpm / tar.gz / SHA256SUMS
+bash scripts/publish-release.sh  # 打 tag + 上传（需 gh 或 GH_TOKEN）
+```
+
+安装后 `utsh` 位于 PATH，系统默认配置 `/etc/utsh/utsh.toml`，WebUI 后端
+`/usr/share/utsh/webui`（离线可用）。详见 `packaging/README.md` 与 `scripts/`。
+
 ## 许可证
 
 核心采用 **Apache-2.0**（见各 `Cargo.toml`）。注意：若后续引入 Bash 官方解析器
