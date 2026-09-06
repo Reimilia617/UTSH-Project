@@ -1,0 +1,59 @@
+.TH UTSH 1 "2026-09" "utsh 0.1.0" "User Commands"
+.SH NAME
+utsh \- UTSH shell 管理工具（Bash 语法兼容、Zsh 插件生态兼容的交互式 Shell）
+.SH SYNOPSIS
+.B utsh
+[\fIOPTIONS\fR] \fICOMMAND\fR [\fIARGS\fR]...
+.SH DESCRIPTION
+UTSH（UT Shell）是一个兼容 Bash 语法、同时兼容 Zsh 插件与主题生态的交互式
+Shell。本手册页描述随包提供的命令行管理工具 \fButsh\fR，用于插件/主题/别名
+管理、环境诊断与 WebUI 启动。
+.SH OPTIONS
+.TP
+\fB\-\-config\fR \fIPATH\fR
+指定配置文件（默认 ~/.config/ut/utsh.toml）。
+.TP
+\fB\-v, \-\-verbose\fR
+输出更详细日志（可叠加：-vv 为 debug，-vvv 为 trace）。
+.TP
+\fB\-h, \-\-help\fR
+显示帮助。
+.TP
+\fB\-V, \-\-version\fR
+显示版本。
+.SH COMMANDS
+.TP
+.B plugin
+插件管理子命令：list / browse [category] / install <name> [\-\-source URL] /
+uninstall / enable / disable / update [name]。
+.TP
+.B theme
+主题子命令：list / set <name> / preview <name>（默认不安装任何主题）。
+.TP
+.B alias
+别名子命令：add <name> <command> / remove <name> / list。
+.TP
+.B status
+显示当前状态：版本、配置路径、插件数、主题、别名数、WebUI 端口。
+.TP
+.B doctor
+环境诊断：Git、Node、目录可写性、配置完整性、端口占用。
+.TP
+.B webui
+启动 WebUI 后端并自动打开浏览器（需 Node.js >= 18）。
+.SH FILES
+.TP
+.I ~/.config/ut/utsh.toml
+用户配置（自动生成默认值）。
+.TP
+.I /etc/utsh/utsh.toml
+系统级默认配置模板（随包安装，作为 conffile 管理）。
+.TP
+.I ~/.local/share/utsh/
+插件与主题数据目录。
+.SH EXIT STATUS
+0 成功；1 命令失败或 doctor 发现环境问题。
+.SH SEE ALSO
+项目的完整文档见 /usr/share/doc/utsh/ 与 https://github.com/Reimilia617/UTSH-Project
+.SH LICENSE
+Apache-2.0

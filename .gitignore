@@ -33,3 +33,6 @@ plugins/zsh-autosuggestions/
 
 # local Rust toolchain (installed by .tools/install-rust.sh)
 .tools/
+
+# build artifacts
+/dist/

@@ -24,11 +24,33 @@ pub(crate) fn resolve_config(override_path: &Option<PathBuf>) -> anyhow::Result<
     Ok((path, cfg))
 }
 
-/// WebUI 后端目录（相对本 crate 的工作区位置）。
+/// WebUI 后端目录解析。
+///
+/// 候选顺序：`UTSH_WEBUI_DIR` → 开发态（crate 相对路径）→ 用户数据目录 →
+/// `/usr/share/utsh` → `/usr/local/share/utsh`。首个含 `src/server.js` 的命中，
+/// 保证源码树、deb/rpm 安装与手动安装三种场景都能工作。
 pub(crate) fn webui_backend_dir() -> PathBuf {
-    let here = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    let dir = here.join("../../webui/backend");
-    std::fs::canonicalize(&dir).unwrap_or(dir)
+    let dev_dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../webui/backend");
+    let mut candidates: Vec<PathBuf> = Vec::new();
+    if let Ok(dir) = std::env::var("UTSH_WEBUI_DIR") {
+        candidates.push(PathBuf::from(dir));
+    }
+    candidates.push(dev_dir.clone());
+    if let Ok(xdg) = std::env::var("XDG_DATA_HOME") {
+        candidates.push(PathBuf::from(xdg).join("utsh").join("webui/backend"));
+    }
+    if let Ok(home) = std::env::var("HOME") {
+        candidates.push(PathBuf::from(home).join(".local/share/utsh/webui/backend"));
+    }
+    candidates.push(PathBuf::from("/usr/share/utsh/webui/backend"));
+    candidates.push(PathBuf::from("/usr/local/share/utsh/webui/backend"));
+    for c in candidates {
+        if c.join("src/server.js").is_file() {
+            return std::fs::canonicalize(&c).unwrap_or(c);
+        }
+    }
+    // 兜底返回开发态路径（doctor / webui 会给出“后端缺失”提示）。
+    dev_dir
 }
 
 /// 顶层分发。

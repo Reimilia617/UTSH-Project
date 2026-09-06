@@ -1,0 +1,37 @@
+# UTSH 系统级默认配置模板。
+#
+# 说明：
+#   * 本文件（/etc/utsh/utsh.toml）作为“出厂默认值”随包安装，
+#     UTSH 运行期仍以用户配置 ~/.config/ut/utsh.toml 为最高优先（缺省即默认值）；
+#   * 修改系统模板不会影响已存在用户配置的用户；
+#   * 升级时本文件作为 conffile 保留本地修改（deb: conffiles / rpm: %config(noreplace)）。
+
+[general]
+default_editor = "nvim"      # 用户可用 $VISUAL / $EDITOR 覆盖（后续阶段）
+history_size = 10000
+history_ignore_dups = true
+
+[prompt]
+format = "utsh"              # 默认不安装任何主题
+show_git_status = true
+show_exit_code = false
+
+[plugins]
+enable_defaults = true       # 内置 zsh-syntax-highlighting + zsh-autosuggestions
+autoupdate = false
+max_plugins = 50
+enabled = []                 # 显式启用的第三方插件（utsh plugin install 自动追加）
+
+[aliases]
+ll = "ls -alF"
+gst = "git status"
+ga = "git add"
+
+[webui]
+enabled = true
+port = 8787
+auto_open = true
+# auth_token 由每个用户首次启动 `utsh webui` 时自动生成到其用户配置，请勿在此放置明文。
+
+[theme]
+current = "none"
