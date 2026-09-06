@@ -1,0 +1,35 @@
+# Rust
+/target
+**/*.rs.bk
+
+# Node.js / WebUI
+**/node_modules/
+**/dist/
+webui/backend/*.log
+webui/backend/logs/
+npm-debug.log*
+pnpm-debug.log*
+.env
+
+# OS noise
+.DS_Store
+Thumbs.db
+
+# Editor
+.idea/
+*.swp
+.vscode/.ropeproject
+
+# Default plugins are git submodules (see plugins/README.md)
+plugins/zsh-syntax-highlighting/
+plugins/zsh-autosuggestions/
+
+# Local runtime data
+*.sock
+/cache/
+
+# npm local cache (created by sandboxed installs)
+.npm-cache/
+
+# local Rust toolchain (installed by .tools/install-rust.sh)
+.tools/

@@ -1,0 +1,31 @@
+[package]
+name = "utsh-ffi"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "UTSH C++ FFI glue: Bash parser bridge (Bison/Flex ready) and GNU Readline wrapper. C++ is only used where Rust cannot call system/existing C libraries directly."
+build = "build.rs"
+
+[lib]
+name = "utsh_ffi"
+path = "src/lib.rs"
+
+[features]
+default = []
+# 编译 readline_wrapper.cpp 并链接 -lreadline（需要系统安装 GNU Readline）。
+readline = ["dep:libc"]
+
+[dependencies]
+# 仅 readline feature 需要：释放 libreadline 分配的缓冲区。
+libc = { version = "0.2", optional = true }
+
+[build-dependencies]
+cc = "1.0"
+
+# bindgen 仅用于重新生成 src/bindings.rs，普通构建不编译它：
+#   cargo run -p utsh-ffi --example gen_bindings   （需要 libclang）
+[dev-dependencies]
+bindgen = { version = "0.69", default-features = false, features = ["runtime"] }
+serde_json = { workspace = true }

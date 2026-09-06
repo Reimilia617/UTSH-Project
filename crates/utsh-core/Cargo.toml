@@ -1,0 +1,21 @@
+[package]
+name = "utsh-core"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+authors.workspace = true
+description = "UTSH core library: config, Bash parser bridge, Zsh-compatible ZLE/hooks, plugins, history and JSON-RPC IPC."
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+toml = { workspace = true }
+thiserror = { workspace = true }
+tracing = { workspace = true }
+# C++ FFI glue (Bash parser / Readline wrapper). Compiled & linked by build.rs
+# of the utsh-ffi crate; see crates/utsh-ffi/build.rs.
+utsh-ffi = { workspace = true }
+
+[dev-dependencies]
+anyhow = { workspace = true }

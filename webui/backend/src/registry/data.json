@@ -1,0 +1,44 @@
+{
+  "plugins": [
+    {
+      "name": "zsh-syntax-highlighting",
+      "category": "syntax",
+      "repo": "zsh-users/zsh-syntax-highlighting",
+      "tags": ["syntax", "highlight"],
+      "license": "BSD-3-Clause",
+      "description": "Fish shell 风格的命令语法高亮（UTSH 内置，随 enable_defaults 自动加载）"
+    },
+    {
+      "name": "zsh-autosuggestions",
+      "category": "completion",
+      "repo": "zsh-users/zsh-autosuggestions",
+      "tags": ["completion", "history"],
+      "license": "MIT",
+      "description": "根据历史记录与补全策略给出灰色自动补全建议（UTSH 内置）"
+    },
+    {
+      "name": "zsh-completions",
+      "category": "completion",
+      "repo": "zsh-users/zsh-completions",
+      "tags": ["completion"],
+      "license": "MIT",
+      "description": "大量额外补全定义（Zsh 官方补充仓库）"
+    },
+    {
+      "name": "zsh-history-substring-search",
+      "category": "history",
+      "repo": "zsh-users/zsh-history-substring-search",
+      "tags": ["history", "search"],
+      "license": "BSD-3-Clause",
+      "description": "输入任意子串即可上下方向键搜索历史"
+    },
+    {
+      "name": "fast-syntax-highlighting",
+      "category": "syntax",
+      "repo": "zdharma-continuum/fast-syntax-highlighting",
+      "tags": ["syntax", "highlight", "async"],
+      "license": "BSD-3-Clause",
+      "description": "高性能异步语法高亮（F-Sy-H）"
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+# Pin the toolchain used by every `cargo` invocation in this repo.
+# The shell should always be built with a stable, current Rust.
+[toolchain]
+channel = "stable"
+profile = "minimal"
+components = ["rustfmt", "clippy", "rust-src"]
+targets = []

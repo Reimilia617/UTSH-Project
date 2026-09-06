@@ -1,0 +1,47 @@
+# UTSH workspace manifest.
+#
+# Layout:
+#   crates/utsh-core  - Rust core library (config / parser bridge / zle / hooks /
+#                       job control / plugins / history / ipc)
+#   crates/utsh-cli   - the `utsh` command line tool
+#   crates/utsh-ffi   - C++ FFI glue (Bash parser + GNU Readline wrapper)
+
+[workspace]
+resolver = "2"
+members = [
+    "crates/utsh-core",
+    "crates/utsh-cli",
+    "crates/utsh-ffi",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.75"
+license = "Apache-2.0"
+authors = ["UT Ecosystem Team"]
+description = "UTSH - a Bash-compatible interactive shell with a Zsh plugin ecosystem, written in Rust."
+
+# Shared dependency versions. Individual crates opt in via `xxx.workspace = true`.
+[workspace.dependencies]
+anyhow = "1.0"
+clap = { version = "4.5", features = ["derive"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+thiserror = "2.0"
+toml = "0.8"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+utsh-core = { path = "crates/utsh-core" }
+utsh-ffi = { path = "crates/utsh-ffi" }
+
+# Small + fast binaries matter for a shell: the interactive binary must boot fast.
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+strip = true
+
+[profile.dev]
+opt-level = 1
