@@ -6,6 +6,7 @@ rust-version.workspace = true
 license.workspace = true
 authors.workspace = true
 description = "The `utsh` command line tool: plugin/theme/alias management, status & doctor diagnostics, WebUI launcher."
+build = "build.rs"
 
 # 产出名为 `utsh` 的可执行文件（crate 名保持 utsh-cli）。
 [[bin]]

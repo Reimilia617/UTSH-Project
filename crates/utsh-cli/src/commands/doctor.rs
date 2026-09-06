@@ -37,7 +37,7 @@ fn command_ok(bin: &str) -> Option<String> {
 }
 
 pub fn run(override_config: &Option<PathBuf>) -> anyhow::Result<()> {
-    println!("UTSH doctor (utsh v{})\n", utsh_core::VERSION);
+    println!("UTSH doctor ({})\n", crate::cli::VERSION);
     let mut checks: Vec<Check> = Vec::new();
 
     // 1. 配置解析

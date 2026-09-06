@@ -17,8 +17,9 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
 REPO="Reimilia617/UTSH-Project"
-VER="${UTSH_VERSION:-$(sed -n '/^\[workspace\.package\]/,/^\[/p' Cargo.toml | sed -n 's/^version = "\(.*\)"$/\1/p' | head -1)}"
-TAG="v${VER}"
+# 用户可见版本（单一来源：根 VERSION 文件，如 26v1 / 26v1.1 / 26v2）
+VER="${UTSH_VERSION:-$(tr -d '[:space:]' < "$ROOT/VERSION")}"
+TAG="$VER"
 DIST="$ROOT/dist"
 
 [ -f "$DIST/SHA256SUMS" ] || { echo "dist/ missing — run bash scripts/package.sh first" >&2; exit 1; }

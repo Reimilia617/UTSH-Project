@@ -79,7 +79,7 @@ if [ -z "$VER" ]; then
     echo "==> resolving latest release ..."
     VER="$(curl -fsSL "$API_URL/releases/latest" | python3 -c "import json,sys; print(json.load(sys.stdin)['tag_name'].lstrip('v'))")"
 fi
-TAG="v${VER}"
+TAG="${VER}"
 echo "==> repo=$REPO  version=$VER  arch=$ARCH  method=$METHOD"
 
 IS_STAGE=""

@@ -25,8 +25,12 @@ fi
 CARGO="${CARGO:-cargo}"
 
 # ---- 版本与架构 ----
-VER="$(sed -n '/^\[workspace\.package\]/,/^\[/p' Cargo.toml | sed -n 's/^version = "\(.*\)"$/\1/p' | head -1)"
-[ -n "$VER" ] || { echo "cannot determine version from Cargo.toml" >&2; exit 1; }
+# 用户可见版本（单一来源：根 VERSION 文件，格式 26v1 / 26v1.1 / 26v2 …）
+VER="$(tr -d '[:space:]' < "$ROOT/VERSION" || true)"
+if ! printf '%s' "$VER" | grep -qE '^26v[0-9]+(\.[0-9]+)?$'; then
+    echo "invalid VERSION file content: '$VER' (expected 26vN[.M])" >&2
+    exit 1
+fi
 DEB_ARCH="$(dpkg --print-architecture 2>/dev/null || echo amd64)"
 case "$DEB_ARCH" in
   amd64) RPM_ARCH=x86_64 ;;
@@ -209,7 +213,10 @@ if [ -n "$rpm_artifact" ]; then
         || tar tzf "$rpm_artifact" 2>/dev/null | head -1 >/dev/null || true
 fi
 
-(cd "$DIST" && sha256sum utsh_* > SHA256SUMS)
+(cd "$DIST" && sha256sum utsh_* utsh-* > SHA256SUMS)
+# 清理构建中间目录，dist/ 只留发行物
+rm -rf "$DIST/debroot" "$DIST/stage" "$DIST/rpmdb" "$DIST/rpmbuild" \
+       "$DIST/rpm-tools" "$DIST/utsh.spec" "$DIST/x86_64" 2>/dev/null || true
 echo
 echo "==> dist/ 产物:"
 ls -lh "$DIST"/utsh_* "$DIST"/*.deb "$DIST"/*.rpm 2>/dev/null

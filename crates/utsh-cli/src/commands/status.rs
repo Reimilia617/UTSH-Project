@@ -17,7 +17,7 @@ pub fn run(config_path: &Path, cfg: &Config) -> anyhow::Result<()> {
     let enabled_third_party = cfg.enabled_plugins().len();
     let config_exists = config_path.is_file();
 
-    println!("UTSH status (utsh v{})", utsh_core::VERSION);
+    println!("UTSH status ({})", crate::cli::VERSION);
     println!("  parser backend : C++ FFI (utsh-ffi / bash_parser)");
     println!(
         "  config path    : {} {}",

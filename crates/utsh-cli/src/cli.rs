@@ -3,11 +3,14 @@ use std::path::PathBuf;
 use clap::{Parser, Subcommand};
 use tracing_subscriber::EnvFilter;
 
+/// 用户可见版本（来自根 VERSION，如 26v1），供 clap/status/doctor 展示。
+pub const VERSION: &str = env!("UTSH_RELEASE_VERSION");
+
 /// UTSH —— 兼容 Bash 语法、兼容 Zsh 插件/主题生态的交互式 Shell 管理工具。
 #[derive(Debug, Parser)]
 #[command(
     name = "utsh",
-    version,
+    version = VERSION,
     about = "UTSH 命令行管理工具",
     long_about = "UTSH（UT Shell）：一个兼容 Bash 语法、同时兼容 Zsh 插件与主题生态的\n交互式 Shell。本 CLI 用于管理插件 / 主题 / 别名、诊断环境并启动 WebUI。"
 )]
