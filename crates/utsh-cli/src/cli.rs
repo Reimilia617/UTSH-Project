@@ -23,8 +23,10 @@ pub struct Cli {
     #[arg(short = 'v', long = "verbose", global = true, action = clap::ArgAction::Count)]
     pub verbose: u8,
 
+    /// 子命令。**缺省（裸 `utsh`）时进入 Shell 会话**——终端/登录 shell 都以
+    /// 无参数方式启动；管理功能通过显式子命令使用（status/plugin/…）。
     #[command(subcommand)]
-    pub command: Command,
+    pub command: Option<Command>,
 }
 
 /// 顶层子命令。

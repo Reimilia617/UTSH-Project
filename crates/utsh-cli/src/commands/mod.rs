@@ -59,6 +59,18 @@ pub fn run(cli: Cli) -> anyhow::Result<()> {
     let Cli {
         command, config, ..
     } = cli;
+
+    // 无子命令 = 进入 Shell 会话（终端模拟器/登录 shell 均以裸 `utsh` 启动）。
+    // TTY → 交互；非 TTY → 把 stdin 当脚本逐行执行。结束后带退出码结束。
+    let Some(command) = command else {
+        let code = shell::run(shell::ShellArgs {
+            command: None,
+            file: None,
+            config,
+        })?;
+        std::process::exit(code);
+    };
+
     match command {
         Command::Status => {
             let (path, cfg) = resolve_config(&config)?;
