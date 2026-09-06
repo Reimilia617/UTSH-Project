@@ -121,6 +121,23 @@ Description: UTSH - Bash-compatible shell manager with a Zsh plugin ecosystem
  启动（需 nodejs）。默认内置语法高亮与自动补全，不安装任何主题。
 EOF
 echo "/etc/utsh/utsh.toml" > "$DEBROOT/DEBIAN/conffiles"
+
+# 注册为合法登录 shell（chsh 只认 /etc/shells 中列出的路径）
+cat > "$DEBROOT/DEBIAN/postinst" <<'EOF'
+#!/bin/sh
+set -e
+if [ -f /etc/shells ]; then
+    grep -qxF "/usr/bin/utsh" /etc/shells || echo "/usr/bin/utsh" >> /etc/shells
+fi
+exit 0
+EOF
+cat > "$DEBROOT/DEBIAN/prerm" <<'EOF'
+#!/bin/sh
+sed -i '\|^/usr/bin/utsh$|d' /etc/shells 2>/dev/null || true
+exit 0
+EOF
+chmod 0755 "$DEBROOT/DEBIAN/postinst" "$DEBROOT/DEBIAN/prerm"
+
 # 用 fakeroot 打包：让包内文件属主为 root:root
 fakeroot dpkg-deb --build "$DEBROOT" "$DIST/utsh_${VER}_${DEB_ARCH}.deb" >/dev/null
 

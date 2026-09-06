@@ -215,6 +215,14 @@ if [ -z "$IS_STAGE" ] && [ "$(id -u)" = "0" ]; then
     chown -R root:root "$ROOTBIN/utsh" "$ROOTSHARE" "$ROOTDOC" "$ROOTMAN/utsh.1.gz" "$ROOTETC" 2>/dev/null || true
 fi
 
+# 注册为合法登录 shell（chsh 只认 /etc/shells 中列出的路径）
+if [ -z "$IS_STAGE" ] && [ "$(id -u)" = "0" ] && [ -f /etc/shells ]; then
+    if ! grep -qxF "$BINDIR/utsh" /etc/shells; then
+        echo "$BINDIR/utsh" >> /etc/shells
+        echo "    registered login shell: $BINDIR/utsh  (now run: chsh -s $BINDIR/utsh)"
+    fi
+fi
+
 # ---------------- 注册 ----------------
 python3 - "$ROOTETC" "$VER" "$METHOD" "$PREFIX" "$ARCH" <<'PY'
 import json, os, sys, time

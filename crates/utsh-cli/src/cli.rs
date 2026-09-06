@@ -13,7 +13,7 @@ use tracing_subscriber::EnvFilter;
 )]
 pub struct Cli {
     /// 配置文件路径（默认 `~/.config/ut/utsh.toml`）
-    #[arg(short, long, global = true, value_name = "PATH")]
+    #[arg(long, global = true, value_name = "PATH")]
     pub config: Option<PathBuf>,
 
     /// 日志详细级别（可叠加：-vv 为 debug，-vvv 为 trace）
@@ -42,6 +42,14 @@ pub enum Command {
     Doctor,
     /// 启动 WebUI 服务并打开浏览器
     Webui,
+    /// 启动交互式 Shell（被 chsh 设为登录 shell 时自动进入）
+    Shell {
+        /// 一次性执行命令后退出（同 `bash -c`）
+        #[arg(short = 'c', long = "command", value_name = "CMD")]
+        command: Option<String>,
+        /// 脚本文件（逐行执行）
+        file: Option<PathBuf>,
+    },
 }
 
 /// `utsh plugin` 子命令。

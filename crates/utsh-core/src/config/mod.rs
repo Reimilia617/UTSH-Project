@@ -252,9 +252,8 @@ impl Config {
     }
 
     fn config_dir_from(xdg: Option<PathBuf>, home: Option<PathBuf>) -> PathBuf {
-        xdg.or(home)
-            .unwrap_or_else(|| PathBuf::from("."))
-            .join("ut")
+        let base = xdg.or_else(|| home.map(|h| h.join(".config")));
+        base.unwrap_or_else(|| PathBuf::from(".")).join("ut")
     }
 
     /// 配置文件默认路径：`~/.config/ut/utsh.toml`。
@@ -289,9 +288,8 @@ impl Config {
     }
 
     fn cache_dir_from(xdg: Option<PathBuf>, home: Option<PathBuf>) -> PathBuf {
-        xdg.or(home)
-            .unwrap_or_else(|| PathBuf::from("."))
-            .join("ut")
+        let base = xdg.or_else(|| home.map(|h| h.join(".cache")));
+        base.unwrap_or_else(|| PathBuf::from(".")).join("ut")
     }
 
     /// 与 Node.js WebUI 通信的 Unix Domain Socket 路径（§4.9）。
@@ -547,7 +545,7 @@ current = "none"
         );
         assert_eq!(
             Config::config_dir_from(None, home.clone()),
-            PathBuf::from("/home/u/ut")
+            PathBuf::from("/home/u/.config/ut")
         );
         assert_eq!(
             Config::data_dir_from(None, home.clone()),

@@ -118,6 +118,14 @@ for f in "${CLEAN_FILES[@]}"; do
     fi
 done
 
+# 撤销登录 shell 注册（/etc/shells 中的 utsh 行）
+if [ -z "$IS_STAGE" ] && [ -f /etc/shells ]; then
+    if grep -q '^/usr/bin/utsh$\|^/usr/local/bin/utsh$' /etc/shells; then
+        sed -i '\|^/usr/bin/utsh$\|^/usr/local/bin/utsh$|d' /etc/shells
+        log "/etc/shells (utsh entries)"
+    fi
+fi
+
 CLEAN_DIRS=(
     "$(RP /usr/share/utsh)"
     "$(RP /usr/local/share/utsh)"

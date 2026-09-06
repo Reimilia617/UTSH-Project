@@ -40,11 +40,16 @@ tar -xzf %{SOURCE0} -C %{buildroot}
 %{_docdir}/utsh
 
 %post
-# 注册：二进制位于 PATH 即完成注册；无额外动作。
+# 注册为合法登录 shell：写入 /etc/shells
+SHELL_PATH=%{_bindir}/utsh
+if [ -f /etc/shells ]; then
+    grep -qxF "$SHELL_PATH" /etc/shells || echo "$SHELL_PATH" >> /etc/shells
+fi
 
 %postun
 if [ "$1" -eq 0 ]; then
-    # 干净卸载：包管理器已删除跟踪文件；这里仅清理遗留空目录。
+    # 干净卸载：撤销 /etc/shells 注册，清理遗留空目录。
+    sed -i "\\|^%{_bindir}/utsh\$|d" /etc/shells 2>/dev/null || true
     rmdir /etc/utsh 2>/dev/null || true
     rmdir %{_datadir}/utsh 2>/dev/null || true
 fi

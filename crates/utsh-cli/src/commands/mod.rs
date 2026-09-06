@@ -3,6 +3,7 @@
 pub mod alias;
 pub mod doctor;
 pub mod plugin;
+pub mod shell;
 pub mod status;
 pub mod theme;
 pub mod webui;
@@ -77,5 +78,14 @@ pub fn run(cli: Cli) -> anyhow::Result<()> {
             plugin::run(&path, &mut cfg, action)
         }
         Command::Webui => webui::run(&config),
+        Command::Shell { command, file } => {
+            // 会话结束后以末条命令的退出码结束进程（`bash -c` 语义）。
+            let code = shell::run(shell::ShellArgs {
+                command,
+                file,
+                config,
+            })?;
+            std::process::exit(code);
+        }
     }
 }

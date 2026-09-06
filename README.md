@@ -104,7 +104,7 @@ cargo run -p utsh-cli -- webui     # 自动打开浏览器
 bash <(curl -fsSL https://raw.githubusercontent.com/Reimilia617/UTSH-Project/main/scripts/install.sh)
 
 # 指定版本 / 手动方式 / 测试根
-sudo UTSH_VERSION=0.1.0 bash scripts/install.sh
+sudo UTSH_VERSION=0.1.1 bash scripts/install.sh
 sudo bash scripts/install.sh --method tarball
 
 # 卸载（彻底干净：包注册 + 全部文件；用户数据默认保留）
