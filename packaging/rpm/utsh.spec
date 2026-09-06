@@ -50,5 +50,5 @@ if [ "$1" -eq 0 ]; then
 fi
 
 %changelog
-* Sat Sep 06 2026 Reimilia617 <313009058+Reimilia617@users.noreply.github.com> - 0.1.0-1
+* Fri Sep 05 2025 Reimilia617 <313009058+Reimilia617@users.noreply.github.com> - 0.1.0-1
 - 首个发布：Rust 核心 + C++ FFI 解析器、CLI、WebUI 后端骨架

@@ -85,7 +85,8 @@ EOF
 
 # ---- 3. FHS tarball（rpm Source0 与手动安装介质） ----
 echo "==> [3/6] FHS tarball"
-tar -C "$STAGE" -czf "$DIST/utsh_${VER}_${DEB_ARCH}_fhs.tar.gz" .
+# 显式列出顶层目录，避免 tar 产生 "./" 前缀（install.sh 按精确成员名取文件）
+tar -C "$STAGE" -czf "$DIST/utsh_${VER}_${DEB_ARCH}_fhs.tar.gz" usr etc
 
 # ---- 4. 仅二进制 tarball ----
 echo "==> [4/6] binary-only tarball"
@@ -120,7 +121,8 @@ Description: UTSH - Bash-compatible shell manager with a Zsh plugin ecosystem
  启动（需 nodejs）。默认内置语法高亮与自动补全，不安装任何主题。
 EOF
 echo "/etc/utsh/utsh.toml" > "$DEBROOT/DEBIAN/conffiles"
-dpkg-deb --build --root-owner-good "$DEBROOT" "$DIST/utsh_${VER}_${DEB_ARCH}.deb" >/dev/null
+# 用 fakeroot 打包：让包内文件属主为 root:root
+fakeroot dpkg-deb --build "$DEBROOT" "$DIST/utsh_${VER}_${DEB_ARCH}.deb" >/dev/null
 
 # ---- 6. .rpm ----
 echo "==> [6/6] building .rpm"
@@ -129,7 +131,10 @@ build_rpm() {
     local spec="$DIST/utsh.spec"
     sed "s|@FHS_TARBALL@|utsh_${VER}_${DEB_ARCH}_fhs.tar.gz|; s|@RPM_ARCH@|${RPM_ARCH}|; s|^Version: .*|Version: ${VER}|" \
         packaging/rpm/utsh.spec > "$spec"
-    mkdir -p "$DIST/rpmbuild"
+    # 沙盒/非 root 环境无 /var/lib/rpm 与 /var/tmp 写权限：全部重定向到 dist
+    mkdir -p "$DIST/rpmbuild/tmp" "$DIST/rpmbuild/BUILD" \
+             "$DIST/rpmbuild/BUILDROOT" "$DIST/rpmbuild/RPMS" "$DIST/rpmdb"
+    export TMPDIR="$DIST/rpmbuild/tmp"
     "$rpmbuild_bin" -bb \
         --define "_topdir $DIST/rpmbuild" \
         --define "_sourcedir $DIST" \
@@ -138,6 +143,8 @@ build_rpm() {
         --define "_rpmdir $DIST/rpmbuild/RPMS" \
         --define "_builddir $DIST/rpmbuild/BUILD" \
         --define "_buildrootdir $DIST/rpmbuild/BUILDROOT" \
+        --define "_dbpath $DIST/rpmdb" \
+        --define "_tmppath $DIST/rpmbuild/tmp" \
         "$spec" >/dev/null
     find "$DIST/rpmbuild/RPMS" -name '*.rpm' -exec mv {} "$DIST/" \;
     rmdir "$DIST/rpmbuild/RPMS"/* 2>/dev/null || true
@@ -154,10 +161,18 @@ else
         echo "    [!] cannot bootstrap rpm (no apt) — .rpm skipped; install rpmbuild and re-run." >&2
         echo "        spec 已保留于 packaging/rpm/utsh.spec"
     else
-        ( cd "$DIST/rpm-tools" && apt-get download rpm >/dev/null 2>&1 || { echo "apt-get download rpm failed" >&2; exit 9; } )
-        for deb in "$DIST"/rpm-tools/*.deb; do dpkg-deb -x "$deb" "$DIST/rpm-tools/root" >/dev/null; done
+        # 下载 rpm 及其运行库依赖（Debian trixie 的包名；失败项仅告警）
+        ( cd "$DIST/rpm-tools" && \
+          for p in rpm rpm-common librpm10 librpmio10 librpmbuild10 librpmsign10 libpopt0 librpm-sequoia-1; do \
+              apt-get download "$p" >/dev/null 2>&1 || echo "    warn: apt-get download $p failed"; \
+          done )
+        for deb in "$DIST"/rpm-tools/*.deb; do
+            [ -f "$deb" ] && dpkg-deb -x "$deb" "$DIST/rpm-tools/root" >/dev/null
+        done
         RPMBUILD="$DIST/rpm-tools/root/usr/bin/rpmbuild"
         export LD_LIBRARY_PATH="$DIST/rpm-tools/root/usr/lib/x86_64-linux-gnu:$DIST/rpm-tools/root/usr/lib"
+        # 宏目录（/usr/lib/rpm/*）也在自举前缀里
+        export RPM_CONFIGDIR="$DIST/rpm-tools/root/usr/lib/rpm"
         if [ -x "$RPMBUILD" ]; then
             build_rpm "$RPMBUILD" || echo "    [!] rpm bootstrap build failed (libs may be incomplete) — see stderr" >&2
         else
