@@ -262,29 +262,44 @@ pub fn run(mut args: ShellArgs) -> anyhow::Result<i32> {
         return Ok(last);
     }
 
-    // 4) 交互循环
-    let stdin = std::io::stdin();
-    loop {
-        let mut line = String::new();
-        print!("utsh> ");
-        std::io::stdout().flush().ok();
-        match stdin.lock().read_line(&mut line) {
-            Ok(0) => break, // EOF (Ctrl-D)
-            Ok(_) => {
-                let code = execute_line(&line, &mut session);
-                session.last_code = code;
-                if should_exit(&line) {
-                    return Ok(code);
-                }
-                append_history(&mut session, &hist_path, line.trim_end());
-            }
-            Err(e) => {
-                eprintln!("utsh: read error: {e}");
-                return Ok(1);
-            }
-        }
+    // 4) 交互会话：raw 行编辑器（方向键历史/光标移动/灰色建议）驱动
+    let lines = session
+        .history
+        .as_ref()
+        .map(|h| h.entries().to_vec())
+        .unwrap_or_default();
+    let code = super::edit::run_interactive(lines, build_prompt, |line| {
+        let code = execute_line(line, &mut session);
+        session.last_code = code;
+        append_history(&mut session, &hist_path, line.trim_end());
+        code
+    })?;
+    Ok(code)
+}
+
+/// 提示符：绿色短路径 + `$`（root 用 `#`），如 `~/project$ `。
+fn build_prompt() -> String {
+    use std::path::Path;
+    let cwd = std::env::current_dir()
+        .map(|p| p.display().to_string())
+        .unwrap_or_else(|_| "?".to_string());
+    let home = std::env::var("HOME").unwrap_or_default();
+    let short = if !home.is_empty() && cwd == home {
+        "~".to_string()
+    } else if !home.is_empty() && cwd.starts_with(&home) {
+        format!("~{}", &cwd[home.len()..])
+    } else {
+        Path::new(&cwd)
+            .file_name()
+            .map(|s| s.to_string_lossy().into_owned())
+            .unwrap_or(cwd.clone())
+    };
+    let no_color = std::env::var_os("NO_COLOR").is_some();
+    if no_color {
+        format!("{short}$ ")
+    } else {
+        format!("\x1b[1;32m{short}\x1b[0m$ ")
     }
-    Ok(session.last_code)
 }
 
 /// 登录 shell 入口：解析 argv[0] 之后的参数（`-c cmd`、脚本路径、其余忽略）。

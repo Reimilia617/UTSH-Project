@@ -16,6 +16,8 @@ path = "src/main.rs"
 [dependencies]
 anyhow = { workspace = true }
 clap = { workspace = true }
+# raw 终端（行编辑器 termios）
+libc = "0.2"
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 utsh-core = { workspace = true }

@@ -2,6 +2,7 @@
 
 pub mod alias;
 pub mod doctor;
+pub mod edit;
 pub mod plugin;
 pub mod shell;
 pub mod status;

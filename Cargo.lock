@@ -643,6 +643,7 @@ version = "26.1.1"
 dependencies = [
  "anyhow",
  "clap",
+ "libc",
  "tracing",
  "tracing-subscriber",
  "utsh-core",

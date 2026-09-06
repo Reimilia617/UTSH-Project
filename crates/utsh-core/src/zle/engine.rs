@@ -260,6 +260,21 @@ impl ZleEngine {
         self.accepted.as_deref()
     }
 
+    /// 取走最近一次被接受的命令行并清空（每次回车后调用一次）。
+    pub fn take_accepted(&mut self) -> Option<String> {
+        self.accepted.take()
+    }
+
+    /// 开始新一行的编辑：清空 buffer/光标/建议与被接受结果，保留历史。
+    /// 用于交互循环中每条命令输入之前，以及 Ctrl-C 取消当前行时。
+    pub fn new_prompt(&mut self) {
+        self.buffer.clear();
+        self.cursor = 0;
+        self.suggestion = None;
+        self.accepted = None;
+        self.reset_history_search();
+    }
+
     /// 只读历史（越靠后越新）。
     pub fn history(&self) -> &[String] {
         &self.history
@@ -317,10 +332,8 @@ impl ZleEngine {
         self.clear_suggestion();
     }
 
-    /// 批量插入一串字符（粘贴/补全接受场景）。当前未被调用方使用，
-    /// 保留给后续补全接受 widget。
-    #[allow(dead_code)]
-    fn insert_str(&mut self, s: &str) {
+    /// 批量插入一串字符（粘贴、自动补全建议接受、编辑器 Tab 接受等场景）。
+    pub fn insert_str(&mut self, s: &str) {
         if s.is_empty() {
             return;
         }
